@@ -1,9 +1,12 @@
-import { Container, Heading } from "@chakra-ui/react";
+import { Container, Flex, Heading, Image } from "@chakra-ui/react";
 
 export default function Home() {
   return (
-    <Container>
-      <Heading size="3xl">Sakurasou Blog</Heading>
+    <Container m={4}>
+      <Flex gap={2} alignItems="center">
+        <Image src="logo.PNG" boxSize="100px" />
+        <Heading size="3xl">Sakurasou Blog</Heading>
+      </Flex>
     </Container>
   );
 }
