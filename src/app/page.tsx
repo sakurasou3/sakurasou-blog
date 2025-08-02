@@ -1,6 +1,6 @@
 import { Header } from "@/components/ui/header";
 import { getAllPosts } from "@/lib/notionApi";
-import { Flex, Stack, Tag, Text, LinkBox, LinkOverlay } from "@chakra-ui/react";
+import { Flex, LinkBox, LinkOverlay, Stack, Tag, Text } from "@chakra-ui/react";
 
 export default async function Home() {
   const allPosts = await getAllPosts();
