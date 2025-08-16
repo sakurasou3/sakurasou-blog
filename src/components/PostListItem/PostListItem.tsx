@@ -1,7 +1,7 @@
-import { PostItem } from "@/lib/notionApi";
 import { Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import Tag from "../ui/Tag";
+import { PostItem } from "@/models/post";
 
 interface Props {
   data: PostItem;
