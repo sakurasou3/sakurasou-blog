@@ -1,13 +1,19 @@
-import { HStack, Spacer, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { ColorModeButton } from "./color-mode";
 
 export const Header = () => (
-  <HStack justifyContent="flex-end">
-    <Text textStyle="2xl" fontWeight="bold" color="fg">
+  <Flex
+    justifyContent="space-between"
+    maxWidth={{ mdTo2xl: 640, base: "90%" }}
+    m="auto"
+    height="40px"
+  >
+    <Text textStyle="3xl" fontWeight="bold" color="fg">
       Notion Blog
     </Text>
-    <Spacer />
-    {/* カラーモード トグルボタン */}
-    <ColorModeButton width="30px" />
-  </HStack>
+    <Flex>
+      {/* カラーモード トグルボタン */}
+      <ColorModeButton width="30px" />
+    </Flex>
+  </Flex>
 );

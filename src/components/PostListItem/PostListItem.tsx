@@ -1,4 +1,4 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Separator, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import Tag from "../ui/Tag";
 import { PostItem } from "@/models/post";
@@ -25,6 +25,7 @@ const PostListItem = ({ data }: Props) => {
           <Tag key={tag} tag={tag} />
         ))}
       </Flex>
+      <Separator mt="8px" />
     </div>
   );
 };

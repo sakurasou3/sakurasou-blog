@@ -1,6 +1,7 @@
 import { getSinglePost } from "@/actions/posts";
 import PostBody from "@/components/Post/postBody";
 import Tag from "@/components/ui/Tag";
+import { Container, Flex, Heading, Separator, Stack } from "@chakra-ui/react";
 import Link from "next/link";
 
 interface Params {
@@ -12,23 +13,25 @@ const PostDetailPage = async ({ params }: Params) => {
   const data = await getSinglePost(slug);
 
   return (
-    <section className="container lg:px-2 px-5 h-screen lg:w-2/5 mx-auto mt-20">
-      <h2 className="w-full text-2xl font-medium">{data.title || ""}</h2>
-      <div className="border-b-2 w-1/3 mt-1 border-sky-900">
-        {data.descriptin || ""}
-      </div>
-      <span className="text-gray-500">{`投稿日 ${data.date}`}</span>
-      <br />
-      <div className="flex flex-wrap gap-2">
-        {data.tags?.map((tag, index) => (
-          <Tag key={index} tag={tag} />
-        ))}
-      </div>
+    <Container maxWidth={{ mdTo2xl: 640, base: "100%" }} p={0} gap={2}>
+      {/** TODO: ここはstikyにしたい */}
+      <Stack gap={1} position="sticky" top="80px">
+        <Heading size="2xl">{data.title || ""}</Heading>
+        <Heading size="md" color="gray.500">
+          {data.date ? `Published: ${data.date}` : ""}
+        </Heading>
+        <Flex gap={2}>
+          {data.tags?.map((tag, index) => (
+            <Tag key={index} tag={tag} />
+          ))}
+        </Flex>
+        <Separator size="sm" my={2} />
+      </Stack>
       <PostBody body={data.markdown || ""} />
       <Link href="/">
         <span className="py-10 block mt-3 text-sky-900">←ホームに戻る</span>
       </Link>
-    </section>
+    </Container>
   );
 };
 
