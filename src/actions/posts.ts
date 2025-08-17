@@ -1,7 +1,8 @@
 "use server";
 
+import type { PostItem } from "@/models/post";
 import { Client, isFullPage, PageObjectResponse } from "@notionhq/client";
-import { PostItem, PostMetaData } from "@/models/post";
+import { log } from "console";
 import { NotionToMarkdown } from "notion-to-md";
 
 const notion = new Client({
@@ -14,7 +15,7 @@ export const getAllPosts = async (): Promise<Array<PostItem>> => {
     // Publishedにチェックがついているもののみ取得
     const posts = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID ?? "",
-      page_size: 100, // TODO
+      page_size: 100, // TODO:
       filter: {
         property: "Published",
         checkbox: {
@@ -27,12 +28,7 @@ export const getAllPosts = async (): Promise<Array<PostItem>> => {
     // 型変換
     const _posts = posts.results.map((data) => {
       if (!isFullPage(data)) {
-        return {
-          title: "",
-          slug: "",
-          date: "",
-          tags: [],
-        };
+        return { title: "", slug: "", date: "", tags: [] };
       }
       return {
         title:
@@ -87,18 +83,33 @@ export const getSinglePost = async (
     });
     if (post.results.length <= 0) return {};
 
-    const data = post.results[0];
+    const data = post.results[0] as PageObjectResponse;
     console.log(data);
 
     const metaData = {
       id: data.id,
-      title: data.properties ? data.properties.Name.title[0].plain_text : "",
-      description: data.properties.Description.rich_text[0].plain_text,
-      date: data.properties.Date.date.start,
-      slug: data.properties.Slug.rich_text[0].plain_text,
-      tags: data.properties.Tags.multi_select.map(
-        (t: { name: string }) => t.name,
-      ),
+      title:
+        data.properties["Name"].type === "title"
+          ? data.properties["Name"].title[0].plain_text
+          : "",
+      description:
+        data.properties["Description"].type === "rich_text"
+          ? data.properties["Description"].rich_text[0].plain_text
+          : "",
+      date:
+        data.properties["Date"].type === "date"
+          ? data.properties["Date"].date?.start || ""
+          : "",
+      slug:
+        data.properties["Slug"].type === "rich_text"
+          ? data.properties["Slug"].rich_text[0].plain_text
+          : "",
+      tags:
+        data.properties["Tags"].type === "multi_select"
+          ? data.properties["Tags"].multi_select.map(
+              (t: { name: string }) => t.name,
+            )
+          : [],
     };
     const mbBlocks = await notionToMd.pageToMarkdown(metaData.id);
     const mdString = notionToMd.toMarkdownString(mbBlocks);
