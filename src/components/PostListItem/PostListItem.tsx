@@ -1,4 +1,4 @@
-import { Flex, Separator, Text } from "@chakra-ui/react";
+import { Box, Flex, Separator, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import Tag from "../ui/Tag";
 import { PostItem } from "@/models/post";
@@ -9,9 +9,15 @@ interface Props {
 
 const PostListItem = ({ data }: Props) => {
   return (
-    <div>
+    <Box>
       <Link href={`detail/${data.slug}`}>
-        <Flex align="center" justifyContent="space-between" width="100%">
+        <Flex
+          align="center"
+          justifyContent="space-between"
+          width="100%"
+          px="2"
+          gap={1}
+        >
           <Text textStyle="xl" color="fg">
             {data.title}
           </Text>
@@ -20,13 +26,13 @@ const PostListItem = ({ data }: Props) => {
           </Text>
         </Flex>
       </Link>
-      <Flex gap={1}>
+      <Flex gap={1} px="2">
         {data.tags.map((tag: string) => (
           <Tag key={tag} tag={tag} />
         ))}
       </Flex>
       <Separator mt="8px" />
-    </div>
+    </Box>
   );
 };
 

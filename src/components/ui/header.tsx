@@ -1,5 +1,6 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { ColorModeButton } from "./color-mode";
+import Link from "next/link";
 
 export const Header = () => (
   <Flex
@@ -8,9 +9,11 @@ export const Header = () => (
     m="auto"
     height="40px"
   >
-    <Text textStyle="3xl" fontWeight="bold" color="fg">
-      Notion Blog
-    </Text>
+    <Link href="/">
+      <Text textStyle="3xl" fontWeight="bold" color="fg">
+        Notion Blog
+      </Text>
+    </Link>
     <Flex>
       {/* カラーモード トグルボタン */}
       <ColorModeButton width="30px" />
