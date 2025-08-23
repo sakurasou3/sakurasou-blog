@@ -29,6 +29,7 @@ const PostCardItem = ({ data }: Props) => {
         </Card.Root>
       </Link>
     </GridItem>
+            {data.tags.map((tag: string) => (
   );
 };
 

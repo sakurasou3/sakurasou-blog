@@ -3,7 +3,7 @@ import { getAllPosts as getAllPostsAction } from "@/actions/posts";
 import PostCardItem from "@/components/PostListItem/PostCardItem";
 import PostListItem from "@/components/PostListItem/PostListItem";
 import { PostItem } from "@/models/post";
-import { Grid, IconButton, Stack } from "@chakra-ui/react";
+import { Grid, IconButton, SimpleGrid, Stack } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { BsCardText, BsListUl } from "react-icons/bs";
 
@@ -36,19 +36,19 @@ export default function Home() {
           {layout === "list" ? <BsCardText /> : <BsListUl />}
         </IconButton>
       </Stack>
-      <Grid
-        gap="6"
-        mt="8px"
-        templateColumns={layout === "card" ? "repeat(2,1fr)" : undefined}
-      >
-        {allPosts.map((data, index) =>
-          layout === "list" ? (
-            <PostListItem key={index} data={data} />
-          ) : (
+      {layout === "card" ? (
+        <SimpleGrid gap="6" mt="8px" columns={{ base: 1, md: 2, xlTo2xl: 3 }}>
+          {allPosts.map((data, index) => (
             <PostCardItem key={index} data={data} />
-          ),
-        )}
-      </Grid>
+          ))}
+        </SimpleGrid>
+      ) : (
+        <Stack gap="6" mt="8px">
+          {allPosts.map((data, index) => (
+            <PostListItem key={index} data={data} />
+          ))}
+        </Stack>
+      )}
     </>
   );
 }
