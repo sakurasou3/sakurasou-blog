@@ -5,7 +5,7 @@ import Link from "next/link";
 export const Header = () => (
   <Flex
     justifyContent="space-between"
-    maxWidth={{ mdTo2xl: 640, base: "90%" }}
+    maxWidth={{ base: "90%", md: 640, lg: 900 }}
     m="auto"
     height="40px"
   >

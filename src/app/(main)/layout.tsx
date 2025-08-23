@@ -6,7 +6,7 @@ const MainLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     <div>
       <Header />
       <main>
-        <Box maxWidth={{ mdTo2xl: 640, base: "90%" }} m="auto" pt="2em">
+        <Box maxWidth={{ base: "90%", md: 640, lg: 900 }} m="auto" pt="2em">
           {children}
         </Box>
       </main>
