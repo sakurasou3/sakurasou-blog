@@ -15,8 +15,7 @@ export const Header = () => (
       </Text>
     </Link>
     <Flex>
-      {/* カラーモード トグルボタン */}
-      <ColorModeButton width="30px" />
+      <ColorModeButton />
     </Flex>
   </Flex>
 );
