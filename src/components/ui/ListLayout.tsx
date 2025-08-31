@@ -6,14 +6,17 @@ import { ListLayoutType, SwitchLayoutButton } from "./switchLayoutButton";
 import { CardList } from "./cardList";
 import { Lists } from "./lists";
 import { Pagination } from "./pagenation";
-import { Stack } from "@chakra-ui/react";
-
-const PAGE_SIZE = 4;
+import { Stack, useBreakpointValue } from "@chakra-ui/react";
 
 export const ListLayout = () => {
   const [allPosts, setAllPosts] = useState<Array<PostItem>>([]);
   const [layout, setLayout] = useState<ListLayoutType>("list");
   const [page, setPage] = useState(0);
+
+  const PAGE_SIZE =
+    layout === "list"
+      ? (useBreakpointValue({ base: 6, lg: 8 }) ?? 6)
+      : (useBreakpointValue({ base: 4, md: 8, lg: 10 }) ?? 4);
 
   const getAllPosts = useCallback(async () => {
     const allPosts = await getAllPostsAction();
@@ -33,10 +36,10 @@ export const ListLayout = () => {
     const startRange = (page - 1) * PAGE_SIZE;
     const endRange = startRange + PAGE_SIZE;
     return allPosts.slice(startRange, endRange);
-  }, [page]);
+  }, [page, PAGE_SIZE]);
 
   return (
-    <Stack position="relative" minHeight="100vh" boxSizing="border-box">
+    <Stack>
       <SwitchLayoutButton layout={layout} onChangeLayout={handleLayoutIcon} />
 
       {layout === "card" ? (
@@ -46,7 +49,7 @@ export const ListLayout = () => {
       )}
 
       <Pagination
-        position="absolute"
+        position="fixed"
         bottom="16px"
         count={allPosts.length}
         pageSize={PAGE_SIZE}
