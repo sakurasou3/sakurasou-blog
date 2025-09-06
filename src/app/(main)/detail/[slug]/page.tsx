@@ -14,8 +14,7 @@ const PostDetailPage = async ({ params }: Params) => {
 
   return (
     <Container maxWidth={{ mdTo2xl: 640, base: "100%" }} p={0} gap={2}>
-      {/** TODO: ここはstikyにしたい */}
-      <Stack gap={1} position="sticky" top="80px">
+      <Stack gap={1} top="80px">
         <Heading size="2xl">{data.title || ""}</Heading>
         <Heading size="md" color="gray.500">
           {data.date ? `Published: ${data.date}` : ""}
