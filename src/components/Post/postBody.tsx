@@ -2,6 +2,7 @@ import { Box } from "@chakra-ui/react";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import rehypeSlug from "rehype-slug";
 
 interface PostBodyProps {
   body: string;
@@ -12,6 +13,7 @@ const PostBody = (props: PostBodyProps) => {
     <Box mt={1} fontSize="md">
       <Markdown
         children={props.body}
+        rehypePlugins={[rehypeSlug]}
         components={{
           code(props) {
             const { children, className, node, ref, ...rest } = props;

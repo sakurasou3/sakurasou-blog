@@ -1,5 +1,6 @@
 import { getSinglePost } from "@/actions/posts";
 import PostBody from "@/components/Post/postBody";
+import { FloatingToc } from "@/components/ui/floatingToc";
 import Tag from "@/components/ui/Tag";
 import { Container, Flex, Heading, Separator, Stack } from "@chakra-ui/react";
 import Link from "next/link";
@@ -26,7 +27,10 @@ const PostDetailPage = async ({ params }: Params) => {
         </Flex>
         <Separator size="sm" my={2} />
       </Stack>
-      <PostBody body={data.markdown || ""} />
+      <Stack direction="row" gap={1}>
+        <PostBody body={data.markdown || ""} />
+        <FloatingToc body={data.markdown || ""} />
+      </Stack>
       <Link href="/">
         <span className="py-10 block mt-3 text-sky-900">←ホームに戻る</span>
       </Link>

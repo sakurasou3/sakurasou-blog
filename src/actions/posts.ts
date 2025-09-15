@@ -2,7 +2,6 @@
 
 import type { PostItem } from "@/models/post";
 import { Client, isFullPage, PageObjectResponse } from "@notionhq/client";
-import { log } from "console";
 import { NotionToMarkdown } from "notion-to-md";
 
 const notion = new Client({
