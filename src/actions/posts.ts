@@ -83,7 +83,6 @@ export const getSinglePost = async (
     if (post.results.length <= 0) return {};
 
     const data = post.results[0] as PageObjectResponse;
-    console.log(data);
 
     const metaData = {
       id: data.id,
