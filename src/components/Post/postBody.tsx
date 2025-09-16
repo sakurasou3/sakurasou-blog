@@ -10,7 +10,7 @@ interface PostBodyProps {
 
 const PostBody = (props: PostBodyProps) => {
   return (
-    <Box mt={1} fontSize="md">
+    <Box mt={1} fontSize="md" width={{ base: "100%", lg: "80%" }}>
       <Markdown
         children={props.body}
         rehypePlugins={[rehypeSlug]}

@@ -29,7 +29,7 @@ const PostDetailPage = async ({ params }: Params) => {
       </Stack>
       <Stack direction="row" gap={1}>
         <PostBody body={data.markdown || ""} />
-        <FloatingToc body={data.markdown || ""} />
+        <FloatingToc title={data.title} body={data.markdown || ""} />
       </Stack>
       <Link href="/">
         <span className="py-10 block mt-3 text-sky-900">←ホームに戻る</span>
