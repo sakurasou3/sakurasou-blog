@@ -4,6 +4,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import rehypeSlug from "rehype-slug";
 import { PostHeaderText } from "./postHeaderText";
+import { PostLinkBox } from "./postLinkBox";
 
 interface PostBodyProps {
   body: string;
@@ -41,6 +42,9 @@ const PostBody = (props: PostBodyProps) => {
           //   );
           // },
           // TODO: aタグとimgはどうにかしたい。
+          a(props) {
+            return <PostLinkBox url={props.href ?? ""} />;
+          },
           code(props) {
             const { children, className, node, ref, ...rest } = props;
             const match = /language-(\w+)/.exec(className || "");

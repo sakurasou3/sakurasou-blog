@@ -7,9 +7,9 @@ const config = defineConfig({
     },
     semanticTokens: {
       colors: {
-        bg: { value: { base: "white", _dark: "black" } },
+        bg: { value: { base: "white", _dark: "#333333" } },
         text: {
-          DEFAULT: { value: { base: "black", _dark: "white" } },
+          DEFAULT: { value: { base: "#333333", _dark: "white" } },
         },
       },
     },

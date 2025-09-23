@@ -3,6 +3,8 @@
 import type { PostItem } from "@/models/post";
 import { Client, isFullPage, PageObjectResponse } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
+import axios from "axios";
+import * as cheerio from "cheerio";
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
@@ -113,6 +115,27 @@ export const getSinglePost = async (
     const mdString = notionToMd.toMarkdownString(mbBlocks);
 
     return { ...metaData, markdown: mdString.parent };
+  } catch (error) {
+    console.log(error);
+    throw new Error();
+  }
+};
+
+export const getOpenGraphProtocol = async (url: string) => {
+  try {
+    const { data } = await axios.get(url);
+    const $ = cheerio.load(data);
+
+    const title =
+      $('meta[property="og:title"]').attr("content") || $("title").text();
+    const description =
+      $('meta[property="og:description"]').attr("content") ||
+      $('meta[name="description"]').attr("content");
+    const image =
+      $('meta[property="og:image"]').attr("content") ||
+      $('meta[name="og:image"]').attr("content");
+
+    return { title, description, image };
   } catch (error) {
     console.log(error);
     throw new Error();
