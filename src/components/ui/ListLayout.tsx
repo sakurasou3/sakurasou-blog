@@ -10,7 +10,7 @@ import { Stack, useBreakpointValue } from "@chakra-ui/react";
 
 export const ListLayout = () => {
   const [allPosts, setAllPosts] = useState<Array<PostItem>>([]);
-  const [layout, setLayout] = useState<ListLayoutType>("list");
+  const [layout, setLayout] = useState<ListLayoutType>("card");
   const [page, setPage] = useState(0);
 
   const PAGE_SIZE =
