@@ -5,13 +5,13 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import rehypeSlug from "rehype-slug";
 import { PostHeaderText } from "./postHeaderText";
 import { PostLinkBox } from "./postLinkBox";
+import PostImage from "./postImage";
 
 interface PostBodyProps {
   body: string;
 }
 
 const PostBody = (props: PostBodyProps) => {
-  console.log(props.body);
   return (
     <Box mt={1} fontSize="md" width={{ base: "100%", lg: "80%" }}>
       <Markdown
@@ -41,9 +41,11 @@ const PostBody = (props: PostBodyProps) => {
           //     </ol>
           //   );
           // },
-          // TODO: aタグとimgはどうにかしたい。
           a(props) {
             return <PostLinkBox url={props.href ?? ""} />;
+          },
+          img(props) {
+            return <PostImage src={props.src} />;
           },
           code(props) {
             const { children, className, node, ref, ...rest } = props;
