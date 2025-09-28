@@ -25,7 +25,7 @@ export const ListLayout = ({ type, tag }: Props) => {
 
   const getAllPosts = useCallback(async () => {
     const allPosts =
-      type === "all" ? await getAllPostsAction() : await getTagPosts(tag);
+      type === "all" ? await getAllPostsAction() : await getTagPosts(tag ?? "");
     setAllPosts(allPosts);
     setPage(1);
   }, []);
