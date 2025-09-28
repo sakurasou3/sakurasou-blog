@@ -1,5 +1,5 @@
 "use client";
-import { getAllPosts as getAllPostsAction } from "@/actions/posts";
+import { getAllPosts as getAllPostsAction, getTagPosts } from "@/actions/posts";
 import { PostItem } from "@/models/post";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ListLayoutType, SwitchLayoutButton } from "./switchLayoutButton";
@@ -8,7 +8,12 @@ import { Lists } from "./lists";
 import { Pagination } from "./pagenation";
 import { Stack, useBreakpointValue } from "@chakra-ui/react";
 
-export const ListLayout = () => {
+interface Props {
+  type: "all" | "tag";
+  tag?: string;
+}
+
+export const ListLayout = ({ type, tag }: Props) => {
   const [allPosts, setAllPosts] = useState<Array<PostItem>>([]);
   const [layout, setLayout] = useState<ListLayoutType>("card");
   const [page, setPage] = useState(0);
@@ -19,7 +24,8 @@ export const ListLayout = () => {
       : (useBreakpointValue({ base: 4, md: 8, lg: 10 }) ?? 4);
 
   const getAllPosts = useCallback(async () => {
-    const allPosts = await getAllPostsAction();
+    const allPosts =
+      type === "all" ? await getAllPostsAction() : await getTagPosts(tag);
     setAllPosts(allPosts);
     setPage(1);
   }, []);

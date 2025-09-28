@@ -16,12 +16,68 @@ export const getAllPosts = async (): Promise<Array<PostItem>> => {
     // Publishedにチェックがついているもののみ取得
     const posts = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID ?? "",
-      page_size: 100, // TODO:
       filter: {
         property: "Published",
         checkbox: {
           equals: true,
         },
+      },
+      sorts: [{ property: "Date", direction: "descending" }],
+    });
+
+    // 型変換
+    const _posts = posts.results.map((data) => {
+      if (!isFullPage(data)) {
+        return { title: "", slug: "", date: "", tags: [] };
+      }
+      return {
+        title:
+          data.properties.Name.type === "title" &&
+          data.properties.Name.title[0].type === "text"
+            ? data.properties.Name.title[0].text.content
+            : "",
+        slug:
+          data.properties.Slug.type === "rich_text" &&
+          data.properties.Slug.rich_text[0].type === "text"
+            ? data.properties.Slug.rich_text[0].text.content
+            : "",
+        date:
+          data.properties.Date.type === "date"
+            ? data.properties.Date.date?.start
+            : "",
+        tags:
+          data.properties.Tags.type === "multi_select"
+            ? data.properties.Tags.multi_select.map((data) => data.name)
+            : [],
+      };
+    });
+    return _posts as PostItem[];
+  } catch (error) {
+    throw new Error();
+  }
+};
+
+/** タグに一致するポスト一覧を取得 **/
+export const getTagPosts = async (tag: string): Promise<Array<PostItem>> => {
+  try {
+    // Publishedにチェックがついているもののみ取得
+    const posts = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID ?? "",
+      filter: {
+        and: [
+          {
+            property: "Published",
+            checkbox: {
+              equals: true,
+            },
+          },
+          {
+            property: "Tags",
+            multi_select: {
+              contains: tag,
+            },
+          },
+        ],
       },
       sorts: [{ property: "Date", direction: "descending" }],
     });

@@ -9,7 +9,7 @@ interface Props {
 const PostCardItem = ({ data }: Props) => {
   return (
     <Card.Root variant="elevated" size="md" h="100%">
-      <Link href={`detail/${data.slug}`}>
+      <Link href={`/detail/${data.slug}`}>
         <Card.Header>
           <Card.Title>{data.title}</Card.Title>
         </Card.Header>

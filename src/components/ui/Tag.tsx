@@ -7,8 +7,7 @@ interface TagProps {
 const Tag = ({ tag }: TagProps) => {
   return (
     <Link
-      // href={`/posts/tag/${tag}/1`}
-      href="/"
+      href={`/posts/tag/${tag}`}
       className="bg-sky-900 dark:bg-sky-300 rounded-full cursor-pointer font-medium"
       style={{ padding: "0 10px" }}
     >
