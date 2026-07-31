@@ -22,4 +22,3 @@
 
 - Notion Database を CMS として利用する
 - 記事データは Notion API 経由で取得する
-

@@ -4,16 +4,16 @@
 
 ### Properties
 
-| Property | Description |
-|----------|-------------|
-| Name | 記事タイトル |
-| Description | 記事概要 |
-| Slug | URLに利用する識別子 |
-| Tags | タグ一覧 |
-| Published | 公開状態 |
-| Published At | 公開日 |
-| Created At | 作成日時 |
-| Updated At | 更新日時 |
+| Property     | Description         |
+| ------------ | ------------------- |
+| Name         | 記事タイトル        |
+| Description  | 記事概要            |
+| Slug         | URLに利用する識別子 |
+| Tags         | タグ一覧            |
+| Published    | 公開状態            |
+| Published At | 公開日              |
+| Created At   | 作成日時            |
+| Updated At   | 更新日時            |
 
 ## Rules
 
@@ -26,5 +26,3 @@
 ## Blocks
 
 対応ブロックは実装と合わせて更新する。
-
-

@@ -33,7 +33,7 @@
 
 ## Tech Stack
 
-- Next.js 15
+- Next.js 16
 - TypeScript
 - React
 - Notion API
@@ -62,3 +62,8 @@ npm・yarnは利用しません。
 - 不明点は推測せず質問すること。
 - 既存のドキュメントと設計方針を優先すること。
 
+---
+
+## Environment
+
+Next.js 16 + pnpm 11系では、`pnpm-workspace.yaml` の `allowBuilds` を手動で `true` にしないと `pnpm install` に失敗することがある。
