@@ -52,4 +52,3 @@
 
 - Server Component でデータ取得を行う
 - Client Component では可能な限り fetch しない
-
