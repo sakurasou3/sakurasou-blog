@@ -10,7 +10,35 @@ export type PostRichText = {
   plainText: string
   href: string | null
   isCode: boolean
+  isEquation: boolean
+  isBold: boolean
+  isItalic: boolean
+  isStrikethrough: boolean
+  isUnderline: boolean
+  color: PostRichTextColor
 }
+
+/** Notion のリッチテキストに指定できる文字色・背景色。 */
+export type PostRichTextColor =
+  | 'default'
+  | 'gray'
+  | 'brown'
+  | 'orange'
+  | 'yellow'
+  | 'green'
+  | 'blue'
+  | 'purple'
+  | 'pink'
+  | 'red'
+  | 'gray_background'
+  | 'brown_background'
+  | 'orange_background'
+  | 'yellow_background'
+  | 'green_background'
+  | 'blue_background'
+  | 'purple_background'
+  | 'pink_background'
+  | 'red_background'
 
 /** Notion 記事本文の段落ブロック。 */
 export type ParagraphBlock = {
@@ -56,6 +84,27 @@ export type ImageBlock = {
   caption: PostRichText[]
 }
 
+/** Notion 記事本文のブックマークblock。 */
+export type BookmarkBlock = {
+  id: string
+  type: 'bookmark'
+  url: string
+  caption: PostRichText[]
+}
+
+/** Notion のcolumn listに含まれる1つのcolumn。 */
+export type PostColumn = {
+  id: string
+  blocks: PostContentBlock[]
+}
+
+/** Notion 記事本文の複数カラムblock。 */
+export type ColumnListBlock = {
+  id: string
+  type: 'column_list'
+  columns: PostColumn[]
+}
+
 /** 記事本文として対応する Notion block の集合。 */
 export type PostContentBlock =
   | ParagraphBlock
@@ -64,6 +113,8 @@ export type PostContentBlock =
   | NumberedListItemBlock
   | CodeBlock
   | ImageBlock
+  | BookmarkBlock
+  | ColumnListBlock
 
 /** 記事詳細画面で使用する、Notion SDK に依存しない公開記事モデル。 */
 export type PostDetail = PostSummary & {
