@@ -1,6 +1,16 @@
-import type { PageObjectResponse } from '@notionhq/client'
+import { isFullBlock } from '@notionhq/client'
+import type {
+  BlockObjectResponse,
+  PageObjectResponse,
+  RichTextItemResponse,
+} from '@notionhq/client'
 
-import type { PostSummary } from '@/types/post'
+import type {
+  PostContentBlock,
+  PostDetail,
+  PostRichText,
+  PostSummary,
+} from '@/types/post'
 
 import { notionClient, notionDatabaseId } from './client'
 
@@ -89,6 +99,99 @@ function toPostSummary(page: PageObjectResponse): PostSummary | null {
   return { title, slug, tags, publishedAt }
 }
 
+/** Notion のリッチテキストを本文レンダラー用のインライン表現へ変換する。 */
+function toPostRichText(
+  richTextItems: readonly RichTextItemResponse[]
+): PostRichText[] {
+  return richTextItems.map((richText) => ({
+    plainText: richText.plain_text,
+    href: richText.type === 'text' ? (richText.text.link?.url ?? null) : null,
+    isCode: richText.annotations.code,
+  }))
+}
+
+/** Notion の画像blockから表示可能なURLを取得する。 */
+function getImageUrl(block: Extract<BlockObjectResponse, { type: 'image' }>) {
+  if (block.image.type === 'external') {
+    return block.image.external.url
+  }
+
+  return block.image.file.url
+}
+
+/** 対応する Notion block を本文レンダラー用モデルへ変換する。 */
+function toPostContentBlock(
+  block: BlockObjectResponse
+): PostContentBlock | null {
+  switch (block.type) {
+    case 'paragraph':
+      return {
+        id: block.id,
+        type: block.type,
+        richText: toPostRichText(block.paragraph.rich_text),
+      }
+    case 'heading_1':
+      return {
+        id: block.id,
+        type: block.type,
+        richText: toPostRichText(block.heading_1.rich_text),
+      }
+    case 'heading_2':
+      return {
+        id: block.id,
+        type: block.type,
+        richText: toPostRichText(block.heading_2.rich_text),
+      }
+    case 'heading_3':
+      return {
+        id: block.id,
+        type: block.type,
+        richText: toPostRichText(block.heading_3.rich_text),
+      }
+    case 'bulleted_list_item':
+      return {
+        id: block.id,
+        type: block.type,
+        richText: toPostRichText(block.bulleted_list_item.rich_text),
+      }
+    case 'numbered_list_item':
+      return {
+        id: block.id,
+        type: block.type,
+        richText: toPostRichText(block.numbered_list_item.rich_text),
+      }
+    case 'code':
+      return {
+        id: block.id,
+        type: block.type,
+        code: block.code.rich_text
+          .map((richText) => richText.plain_text)
+          .join(''),
+        language: block.code.language,
+      }
+    case 'image': {
+      const url = getImageUrl(block)
+
+      if (!url) {
+        console.warn(`Skipped Notion image block ${block.id}: URL is missing.`)
+        return null
+      }
+
+      return {
+        id: block.id,
+        type: block.type,
+        url,
+        caption: toPostRichText(block.image.caption),
+      }
+    }
+    default:
+      console.warn(
+        `Skipped unsupported Notion block ${block.id} with type ${block.type}.`
+      )
+      return null
+  }
+}
+
 /**
  * Data Source の問い合わせ結果が完全なページオブジェクトかを判定する。
  */
@@ -115,6 +218,42 @@ async function getDataSourceId() {
   }
 
   return database.data_sources[0].id
+}
+
+/** 記事ページ直下のblockを、ページネーションを含めてすべて取得する。 */
+async function getPostContent(pageId: string): Promise<PostContentBlock[]> {
+  const content: PostContentBlock[] = []
+
+  for (let startCursor: string | undefined; ;) {
+    const response = await notionClient.blocks.children.list({
+      block_id: pageId,
+      page_size: 100,
+      start_cursor: startCursor,
+    })
+
+    for (const result of response.results) {
+      if (!isFullBlock(result)) {
+        console.warn(`Skipped partial Notion block ${result.id}.`)
+        continue
+      }
+
+      const block = toPostContentBlock(result)
+
+      if (block) {
+        content.push(block)
+      }
+    }
+
+    if (!response.has_more) {
+      return content
+    }
+
+    if (!response.next_cursor) {
+      throw new Error('Notion returned an incomplete page of post blocks.')
+    }
+
+    startCursor = response.next_cursor
+  }
 }
 
 /**
@@ -167,5 +306,60 @@ export async function getPublishedPosts(): Promise<PostSummary[]> {
     }
 
     startCursor = response.next_cursor
+  }
+}
+
+/**
+ * slug に一致する公開済み記事と、その本文blockを取得する。
+ *
+ * @returns 記事が存在しないか必須プロパティが不正な場合は null
+ * @throws 同一slugの公開済み記事が複数存在する場合
+ */
+export async function getPublishedPostBySlug(
+  slug: string
+): Promise<PostDetail | null> {
+  const dataSourceId = await getDataSourceId()
+  const response = await notionClient.dataSources.query({
+    data_source_id: dataSourceId,
+    filter: {
+      and: [
+        {
+          property: 'Published',
+          checkbox: {
+            equals: true,
+          },
+        },
+        {
+          property: PROPERTY_NAMES.slug,
+          rich_text: {
+            equals: slug,
+          },
+        },
+      ],
+    },
+    page_size: 100,
+  })
+  const matchingPages = response.results.filter(isPageObjectResponse)
+
+  if (matchingPages.length === 0) {
+    return null
+  }
+
+  if (matchingPages.length > 1 || response.has_more) {
+    throw new Error(
+      `The Notion database has multiple published posts with slug "${slug}".`
+    )
+  }
+
+  const page = matchingPages[0]
+  const post = toPostSummary(page)
+
+  if (!post) {
+    return null
+  }
+
+  return {
+    ...post,
+    content: await getPostContent(page.id),
   }
 }
