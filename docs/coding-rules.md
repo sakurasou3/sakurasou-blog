@@ -52,3 +52,8 @@
 
 - Server Component でデータ取得を行う
 - Client Component では可能な限り fetch しない
+
+## 動作確認
+
+- ユーザーが依頼した場合を除き、開発サーバーでの動作検証は不要
+
