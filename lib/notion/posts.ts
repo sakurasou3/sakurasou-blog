@@ -9,8 +9,10 @@ import type {
   PostContentBlock,
   PostDetail,
   PostRichText,
+  PostRichTextColor,
   PostSummary,
 } from '@/types/post'
+import { isHttpsUrl } from '@/util/url'
 
 import { notionClient, notionDatabaseId } from './client'
 
@@ -107,6 +109,12 @@ function toPostRichText(
     plainText: richText.plain_text,
     href: richText.type === 'text' ? (richText.text.link?.url ?? null) : null,
     isCode: richText.annotations.code,
+    isEquation: richText.type === 'equation',
+    isBold: richText.annotations.bold,
+    isItalic: richText.annotations.italic,
+    isStrikethrough: richText.annotations.strikethrough,
+    isUnderline: richText.annotations.underline,
+    color: richText.annotations.color as PostRichTextColor,
   }))
 }
 
@@ -120,9 +128,9 @@ function getImageUrl(block: Extract<BlockObjectResponse, { type: 'image' }>) {
 }
 
 /** 対応する Notion block を本文レンダラー用モデルへ変換する。 */
-function toPostContentBlock(
+async function toPostContentBlock(
   block: BlockObjectResponse
-): PostContentBlock | null {
+): Promise<PostContentBlock | null> {
   switch (block.type) {
     case 'paragraph':
       return {
@@ -184,12 +192,94 @@ function toPostContentBlock(
         caption: toPostRichText(block.image.caption),
       }
     }
+    case 'bookmark': {
+      if (!isHttpsUrl(block.bookmark.url)) {
+        console.warn(
+          `Skipped Notion bookmark block ${block.id}: URL is invalid.`
+        )
+        return null
+      }
+
+      return {
+        id: block.id,
+        type: block.type,
+        url: block.bookmark.url,
+        caption: toPostRichText(block.bookmark.caption),
+      }
+    }
+    case 'column_list':
+      return {
+        id: block.id,
+        type: block.type,
+        columns: await getColumns(block.id),
+      }
     default:
       console.warn(
         `Skipped unsupported Notion block ${block.id} with type ${block.type}.`
       )
       return null
   }
+}
+
+/** 指定blockの子要素を、ページネーションを含めてすべて取得する。 */
+async function getBlockChildren(
+  blockId: string
+): Promise<BlockObjectResponse[]> {
+  const blocks: BlockObjectResponse[] = []
+
+  for (let startCursor: string | undefined; ;) {
+    const response = await notionClient.blocks.children.list({
+      block_id: blockId,
+      page_size: 100,
+      start_cursor: startCursor,
+    })
+
+    for (const result of response.results) {
+      if (!isFullBlock(result)) {
+        console.warn(`Skipped partial Notion block ${result.id}.`)
+        continue
+      }
+
+      blocks.push(result)
+    }
+
+    if (!response.has_more) {
+      return blocks
+    }
+
+    if (!response.next_cursor) {
+      throw new Error('Notion returned an incomplete page of post blocks.')
+    }
+
+    startCursor = response.next_cursor
+  }
+}
+
+/** column listの子columnと、その本文blockを取得する。 */
+async function getColumns(columnListId: string) {
+  const columns = []
+
+  for (const block of await getBlockChildren(columnListId)) {
+    if (block.type !== 'column') {
+      console.warn(
+        `Skipped child block ${block.id} with type ${block.type} in column list ${columnListId}.`
+      )
+      continue
+    }
+
+    const content = await Promise.all(
+      (await getBlockChildren(block.id)).map(toPostContentBlock)
+    )
+    const supportedBlocks = content.filter(
+      (contentBlock): contentBlock is PostContentBlock => contentBlock !== null
+    )
+
+    if (supportedBlocks.length > 0) {
+      columns.push({ id: block.id, blocks: supportedBlocks })
+    }
+  }
+
+  return columns
 }
 
 /**
@@ -222,38 +312,13 @@ async function getDataSourceId() {
 
 /** 記事ページ直下のblockを、ページネーションを含めてすべて取得する。 */
 async function getPostContent(pageId: string): Promise<PostContentBlock[]> {
-  const content: PostContentBlock[] = []
+  const content = await Promise.all(
+    (await getBlockChildren(pageId)).map(toPostContentBlock)
+  )
 
-  for (let startCursor: string | undefined; ;) {
-    const response = await notionClient.blocks.children.list({
-      block_id: pageId,
-      page_size: 100,
-      start_cursor: startCursor,
-    })
-
-    for (const result of response.results) {
-      if (!isFullBlock(result)) {
-        console.warn(`Skipped partial Notion block ${result.id}.`)
-        continue
-      }
-
-      const block = toPostContentBlock(result)
-
-      if (block) {
-        content.push(block)
-      }
-    }
-
-    if (!response.has_more) {
-      return content
-    }
-
-    if (!response.next_cursor) {
-      throw new Error('Notion returned an incomplete page of post blocks.')
-    }
-
-    startCursor = response.next_cursor
-  }
+  return content.filter(
+    (contentBlock): contentBlock is PostContentBlock => contentBlock !== null
+  )
 }
 
 /**

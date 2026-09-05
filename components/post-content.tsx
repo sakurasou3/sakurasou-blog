@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 import type {
   BulletedListItemBlock,
   NumberedListItemBlock,
@@ -6,9 +8,11 @@ import type {
 } from '@/types/post'
 
 import { RichText } from './rich-text'
+import { MermaidDiagram } from './mermaid-diagram'
 
 type PostContentProps = {
   blocks: readonly PostContentBlock[]
+  className?: string
 }
 
 type ListBlock = BulletedListItemBlock | NumberedListItemBlock
@@ -86,6 +90,11 @@ function getPlainText(richText: readonly PostRichText[]) {
   return richText.map((item) => item.plainText).join('')
 }
 
+/** bookmark の表示用ホスト名を取得する。 */
+function getBookmarkHost(url: string) {
+  return new URL(url).host
+}
+
 /** 描画エントリがグループ化済みのリストかを判定する。 */
 function isPostContentList(entry: PostContentEntry): entry is PostContentList {
   return entry.type === 'bulleted_list' || entry.type === 'numbered_list'
@@ -138,6 +147,10 @@ function PostContentBlock({ block }: { block: NonListBlock }) {
         </h4>
       )
     case 'code':
+      if (block.language === 'mermaid') {
+        return <MermaidDiagram source={block.code} />
+      }
+
       return (
         <div className="overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 dark:border-zinc-800">
           <p className="border-b border-zinc-800 px-4 py-2 font-mono text-xs text-zinc-400">
@@ -158,6 +171,44 @@ function PostContentBlock({ block }: { block: NonListBlock }) {
           className="h-auto w-full rounded-lg"
         />
       )
+    case 'bookmark': {
+      const caption = getPlainText(block.caption)
+      const host = getBookmarkHost(block.url)
+
+      return (
+        <a
+          href={block.url}
+          target="_blank"
+          rel="noreferrer"
+          className="block rounded-lg border border-zinc-200 p-4 transition-colors hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-900"
+        >
+          <span className="block break-words font-medium text-zinc-950 dark:text-zinc-50">
+            {caption ? <RichText richText={block.caption} /> : host}
+          </span>
+          <span className="mt-1 block break-all text-sm text-zinc-500 dark:text-zinc-400">
+            {host}
+          </span>
+        </a>
+      )
+    }
+    case 'column_list': {
+      const style = {
+        '--column-count': String(block.columns.length),
+      } as CSSProperties
+
+      return (
+        <section
+          className="grid grid-cols-1 gap-6 sm:[grid-template-columns:repeat(var(--column-count),minmax(0,1fr))]"
+          style={style}
+        >
+          {block.columns.map((column) => (
+            <div key={column.id} className="min-w-0">
+              <PostContent blocks={column.blocks} className="space-y-4" />
+            </div>
+          ))}
+        </section>
+      )
+    }
   }
 }
 
@@ -171,9 +222,9 @@ function PostContentEntry({ entry }: { entry: PostContentEntry }) {
 }
 
 /** 記事本文をセマンティックなHTMLとして描画する。 */
-export function PostContent({ blocks }: PostContentProps) {
+export function PostContent({ blocks, className }: PostContentProps) {
   return (
-    <div className="space-y-6">
+    <div className={className ?? 'space-y-6'}>
       {groupPostContentBlocks(blocks).map((entry) => (
         <PostContentEntry key={entry.id} entry={entry} />
       ))}
