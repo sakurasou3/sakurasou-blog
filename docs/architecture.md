@@ -18,6 +18,8 @@
 - 公開対象の記事が更新された場合は、公開処理を実行して静的ページを再生成する
 - 更新頻度が高くなった場合は ISR または On-demand Revalidation を検討する
 
+公開フロー：Notionの Published=true を起点としてサイトを再ビルドする。初期実装では手動デプロイとし、自動化が必要になった段階でNotion Webhook + Vercel Deploy Hookを導入する。
+
 ## CMS
 
 - Notion Database を CMS として利用する
