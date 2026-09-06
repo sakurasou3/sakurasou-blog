@@ -25,3 +25,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+@media (hover: hover) {
+  .post-list-item:has(.post-list-item-link:hover) .post-list-item-title {
+    text-decoration-line: underline;
+  }
+}
+
+.post-list-item:has(.post-list-item-link:focus-visible) .post-list-item-title {
+  text-decoration-line: underline;
+}

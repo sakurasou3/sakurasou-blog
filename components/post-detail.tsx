@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { TagLink } from '@/components/tag-link'
 import type { PostDetail as PostDetailData } from '@/types/post'
 import { formatPublishedDate } from '@/util/dateUtil'
 
@@ -24,7 +25,9 @@ export function PostDetail({ post, children }: PostDetailProps) {
             {post.tags.length > 0 ? (
               <ul aria-label="タグ" className="flex flex-wrap gap-x-2 gap-y-1">
                 {post.tags.map((tag) => (
-                  <li key={tag}>{tag}</li>
+                  <li key={tag}>
+                    <TagLink tag={tag} />
+                  </li>
                 ))}
               </ul>
             ) : null}
