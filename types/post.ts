@@ -5,6 +5,12 @@ export type PostSummary = {
   publishedAt: string
 }
 
+/** タグ名と、そのタグを持つ公開記事数。 */
+export type TagPostCount = {
+  name: string
+  postCount: number
+}
+
 /** Notion のインラインテキストを画面に渡すための表現。 */
 export type PostRichText = {
   plainText: string

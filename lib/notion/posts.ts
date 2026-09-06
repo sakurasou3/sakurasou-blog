@@ -7,6 +7,7 @@ import type {
 
 import type {
   PostContentBlock,
+  PostColumn,
   PostDetail,
   PostRichText,
   PostRichTextColor,
@@ -256,8 +257,8 @@ async function getBlockChildren(
 }
 
 /** column listの子columnと、その本文blockを取得する。 */
-async function getColumns(columnListId: string) {
-  const columns = []
+async function getColumns(columnListId: string): Promise<PostColumn[]> {
+  const columns: PostColumn[] = []
 
   for (const block of await getBlockChildren(columnListId)) {
     if (block.type !== 'column') {
@@ -267,16 +268,17 @@ async function getColumns(columnListId: string) {
       continue
     }
 
-    const content = await Promise.all(
-      (await getBlockChildren(block.id)).map(toPostContentBlock)
-    )
-    const supportedBlocks = content.filter(
-      (contentBlock): contentBlock is PostContentBlock => contentBlock !== null
-    )
+    const supportedBlocks: PostContentBlock[] = []
 
-    if (supportedBlocks.length > 0) {
-      columns.push({ id: block.id, blocks: supportedBlocks })
+    for (const childBlock of await getBlockChildren(block.id)) {
+      const contentBlock = await toPostContentBlock(childBlock)
+
+      if (contentBlock) {
+        supportedBlocks.push(contentBlock)
+      }
     }
+
+    columns.push({ id: block.id, blocks: supportedBlocks })
   }
 
   return columns
@@ -312,13 +314,17 @@ async function getDataSourceId() {
 
 /** 記事ページ直下のblockを、ページネーションを含めてすべて取得する。 */
 async function getPostContent(pageId: string): Promise<PostContentBlock[]> {
-  const content = await Promise.all(
-    (await getBlockChildren(pageId)).map(toPostContentBlock)
-  )
+  const content: PostContentBlock[] = []
 
-  return content.filter(
-    (contentBlock): contentBlock is PostContentBlock => contentBlock !== null
-  )
+  for (const block of await getBlockChildren(pageId)) {
+    const contentBlock = await toPostContentBlock(block)
+
+    if (contentBlock) {
+      content.push(contentBlock)
+    }
+  }
+
+  return content
 }
 
 /**
