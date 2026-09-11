@@ -6,11 +6,9 @@ type MermaidDiagramProps = {
   source: string
 }
 
-/** 現在のシステムテーマに対応する Mermaid テーマを取得する。 */
+/** HTML 属性に適用済みのサイトテーマに対応する Mermaid テーマを取得する。 */
 function getMermaidTheme() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'default'
+  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default'
 }
 
 /** Mermaid ソースを SVG 図として表示する。 */
@@ -18,6 +16,20 @@ export function MermaidDiagram({ source }: MermaidDiagramProps) {
   const identifier = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const [svg, setSvg] = useState<string | null>(null)
   const [hasError, setHasError] = useState(false)
+  const [themeVersion, setThemeVersion] = useState(0)
+
+  useEffect(() => {
+    /** テーマ変更時に Mermaid 図の再描画を要求する。 */
+    function handleThemeChange() {
+      setThemeVersion((currentVersion) => currentVersion + 1)
+    }
+
+    document.addEventListener('themechange', handleThemeChange)
+
+    return () => {
+      document.removeEventListener('themechange', handleThemeChange)
+    }
+  }, [])
 
   useEffect(() => {
     let isActive = true
@@ -51,7 +63,7 @@ export function MermaidDiagram({ source }: MermaidDiagramProps) {
     return () => {
       isActive = false
     }
-  }, [identifier, source])
+  }, [identifier, source, themeVersion])
 
   if (hasError) {
     return (
