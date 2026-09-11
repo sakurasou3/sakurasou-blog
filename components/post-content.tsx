@@ -185,8 +185,8 @@ function PostContentBlock({ block }: { block: NonListBlock }) {
           <span className="block break-words font-medium text-zinc-950 dark:text-zinc-50">
             {caption ? <RichText richText={block.caption} /> : host}
           </span>
-          <span className="mt-1 block break-all text-sm text-zinc-500 dark:text-zinc-400">
-            {host}
+          <span className="mt-1 block break-all text-sm truncate text-zinc-500 dark:text-zinc-400">
+            {block.url}
           </span>
         </a>
       )

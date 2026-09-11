@@ -96,6 +96,17 @@ export function TagList({ tags }: TagListProps) {
             {displayedTags.map((tag) => (
               <TagLink key={tag.name} tag={tag.name} className="shrink-0" />
             ))}
+            {isExpanded && hasOverflow ? (
+              <button
+                type="button"
+                aria-controls="tag-list"
+                aria-expanded={isExpanded}
+                onClick={handleVisibilityToggle}
+                className="ml-auto shrink-0 text-zinc-600 underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-none dark:text-zinc-300"
+              >
+                less
+              </button>
+            ) : null}
           </div>
           <div
             ref={tagMeasurerRef}
@@ -109,7 +120,7 @@ export function TagList({ tags }: TagListProps) {
             ))}
           </div>
         </div>
-        {hasOverflow ? (
+        {hasOverflow && !isExpanded ? (
           <button
             type="button"
             aria-controls="tag-list"
@@ -117,7 +128,7 @@ export function TagList({ tags }: TagListProps) {
             onClick={handleVisibilityToggle}
             className="ml-4 shrink-0 text-zinc-600 underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-none dark:text-zinc-300"
           >
-            {isExpanded ? 'less' : 'more'}
+            more
           </button>
         ) : null}
       </div>

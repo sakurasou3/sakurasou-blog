@@ -372,6 +372,7 @@ export async function getPublishedPosts(): Promise<PostSummary[]> {
       return posts
     }
 
+    // has_moreがtrueなのにnext_cursorがないのは、 Notion API応答として矛盾するため明示的にエラー
     if (!response.next_cursor) {
       throw new Error('Notion returned an incomplete page of published posts.')
     }
