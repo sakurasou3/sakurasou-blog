@@ -44,3 +44,85 @@ body {
 .post-list-item:has(.post-list-item-link:focus-visible) .post-list-item-title {
   text-decoration-line: underline;
 }
+
+.post-code-block {
+  --post-code-background: #ffffff;
+  --post-code-foreground: #24292e;
+  --post-code-border: #e1e4e8;
+  --post-code-header-background: #f6f8fa;
+
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--post-code-border);
+  border-radius: 0.5rem;
+  background-color: var(--post-code-background);
+  color: var(--post-code-foreground);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.post-code-block .post-code-block-language {
+  margin: 0;
+  border-bottom: 1px solid var(--post-code-border);
+  padding: 0.5rem 1rem;
+  overflow-wrap: anywhere;
+  background-color: var(--post-code-header-background);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.post-code-block pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 1rem;
+  background-color: var(--post-code-background);
+  color: var(--post-code-foreground);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.post-code-block pre code {
+  font-family: inherit;
+}
+
+.post-code-block .shiki,
+.post-code-block .shiki span {
+  font-style: var(--shiki-light-font-style, normal);
+  font-weight: var(--shiki-light-font-weight, normal);
+  text-decoration: var(--shiki-light-text-decoration, none);
+}
+
+:root[data-theme='dark'] .post-code-block {
+  --post-code-background: #11161c;
+  --post-code-foreground: #e6edf3;
+  --post-code-border: #30363d;
+  --post-code-header-background: #161b22;
+}
+
+:root[data-theme='dark'] .post-code-block .shiki,
+:root[data-theme='dark'] .post-code-block .shiki span {
+  background-color: var(--shiki-dark-bg, transparent) !important;
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style, normal) !important;
+  font-weight: var(--shiki-dark-font-weight, normal) !important;
+  text-decoration: var(--shiki-dark-text-decoration, none) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .post-code-block {
+    --post-code-background: #24292e;
+    --post-code-foreground: #e1e4e8;
+    --post-code-border: #1b1f23;
+    --post-code-header-background: #1f2428;
+  }
+
+  :root:not([data-theme]) .post-code-block .shiki,
+  :root:not([data-theme]) .post-code-block .shiki span {
+    background-color: var(--shiki-dark-bg, transparent) !important;
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style, normal) !important;
+    font-weight: var(--shiki-dark-font-weight, normal) !important;
+    text-decoration: var(--shiki-dark-text-decoration, none) !important;
+  }
+}

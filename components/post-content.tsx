@@ -9,6 +9,7 @@ import type {
 
 import { RichText } from './rich-text'
 import { MermaidDiagram } from './mermaid-diagram'
+import { CodeBlock } from './code-block'
 
 type PostContentProps = {
   blocks: readonly PostContentBlock[]
@@ -151,16 +152,7 @@ function PostContentBlock({ block }: { block: NonListBlock }) {
         return <MermaidDiagram source={block.code} />
       }
 
-      return (
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 dark:border-zinc-800">
-          <p className="border-b border-zinc-800 px-4 py-2 font-mono text-xs text-zinc-400">
-            {block.language}
-          </p>
-          <pre className="overflow-x-auto p-4 text-sm leading-6 text-zinc-100">
-            <code>{block.code}</code>
-          </pre>
-        </div>
-      )
+      return <CodeBlock code={block.code} language={block.language} />
     case 'image':
       return (
         // Notion の外部URL・期限付きfile URLは next/image の最適化対象にしない。
