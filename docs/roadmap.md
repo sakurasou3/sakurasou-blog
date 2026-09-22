@@ -12,7 +12,6 @@
 - [x] ordered_list_item
 - [x] bulleted_list_item
 - [ ] table
-- [ ] equation
 - [ ] callout
 
 ## Future

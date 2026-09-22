@@ -10,6 +10,7 @@ import type {
 import { RichText } from './rich-text'
 import { MermaidDiagram } from './mermaid-diagram'
 import { CodeBlock } from './code-block'
+import { PostImage } from './post-image'
 
 type PostContentProps = {
   blocks: readonly PostContentBlock[]
@@ -154,15 +155,7 @@ function PostContentBlock({ block }: { block: NonListBlock }) {
 
       return <CodeBlock code={block.code} language={block.language} />
     case 'image':
-      return (
-        // Notion の外部URL・期限付きfile URLは next/image の最適化対象にしない。
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={block.url}
-          alt={getPlainText(block.caption)}
-          className="h-auto w-full rounded-lg"
-        />
-      )
+      return <PostImage src={block.url} alt={getPlainText(block.caption)} />
     case 'bookmark': {
       const caption = getPlainText(block.caption)
       const host = getBookmarkHost(block.url)
